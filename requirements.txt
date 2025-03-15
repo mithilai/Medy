@@ -1,0 +1,11 @@
+groq
+langchain_community
+langchain_groq
+python-dotenv
+streamlit
+pillow
+opencv-python-headless
+pinecone
+sentence-transformers
+numpy
+-u duckduckgosearch
