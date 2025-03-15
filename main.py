@@ -10,7 +10,6 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage
 from langchain.tools import DuckDuckGoSearchRun
 
-load_dotenv()
 
 # ------------------ Load API Keys & Setup ------------------
 load_dotenv()
