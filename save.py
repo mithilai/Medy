@@ -13,7 +13,7 @@ from langchain.tools import DuckDuckGoSearchRun
 
 # ------------------ Load API Keys & Setup ------------------
 load_dotenv()
-groq_api_keys = os.getenv("GROQ_API_KEY")
+groq_api_keys = os.getenv("GROQ_API_KEYS")
 
 def get_chat_model(model_name):
     """Initializes a ChatGroq model with random API key & fixed temperature."""
@@ -26,10 +26,57 @@ advisor_llm = get_chat_model("llama-3.2-11b-vision-preview")  # Health Analysis
 supervisor_llm = get_chat_model("deepseek-r1-distill-llama-70b")  # Validation
 chatbot_llm = get_chat_model("llama-3.3-70b-specdec")  # General Q&A
 
+# def get_chat_model(model_name):
+#     """Randomly selects a Groq API key and initializes the chat model."""
+#     if not groq_api_keys or groq_api_keys == [""]:
+#         raise ValueError("No valid Groq API keys found in the .env file.")
+
+#     # Randomly select an API key from the list
+#     selected_key = random.choice(groq_api_keys).strip()
+
+#     # Set API key for the environment
+#     os.environ["GROQ_API_KEY"] = selected_key
+
+#     # Initialize the Groq model
+#     return ChatGroq(model_name=model_name, temperature=0.2)
+
+# # ------------------ Load API Keys & Setup ------------------
+# load_dotenv()
+# groq_api_keys = os.getenv("GROQ_API_KEYS").split(",")  # Store multiple API keys in .env, comma-separated
+
+# def get_chat_model(model_name):
+#     """Initializes a ChatGroq model with a random API key & fixed temperature."""
+#     selected_key = random.choice(groq_api_keys)  # Randomly select an API key
+#     os.environ["GROQ_API_KEY"] = selected_key
+#     return ChatGroq(model_name=model_name, temperature=0.2)  # Consistent responses
+
+
+
 # Initialize Web Search Tool
 ddg_search = DuckDuckGoSearchRun()
 
 # ------------------ Live Camera Feed ------------------
+def get_camera_feed(camera_index):
+    """Captures a live feed from the selected camera."""
+    cap = cv2.VideoCapture(camera_index)
+    ret, frame = cap.read()
+    cap.release()
+    
+    if ret:
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # Convert to RGB
+        return frame
+    else:
+        return None
+
+def capture_image(camera_index):
+    """Captures an image from the live camera feed."""
+    frame = get_camera_feed(camera_index)
+    if frame is not None:
+        return frame
+    else:
+        st.error("Failed to capture image.")
+        return None
+
 def process_uploaded_image(uploaded_file):
     """Processes uploaded image into OpenCV format."""
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
@@ -139,16 +186,23 @@ medical_history = st.text_input("Enter your medical history (e.g., Diabetes, Hig
 input_method = st.radio("Choose how to provide an image:", ["📸 Live Camera Feed", "📤 Upload Image"])
 
 image = None
+camera_index = 0  # Default to back camera
 
 if input_method == "📸 Live Camera Feed":
-    st.write("📷 Capture an image using your camera:")
+    st.write("🔄 Toggle Camera:")
+    if st.button("Switch Camera"):
+        camera_index = 1 if camera_index == 0 else 0  # Switch between front & back camera
 
-    # ✅ Streamlit Cloud-compatible camera capture
-    camera_image = st.camera_input("Take a picture")
+    # Display Live Camera Feed
+    frame = get_camera_feed(camera_index)
+    if frame is not None:
+        st.image(frame, caption="Live Camera Feed", use_container_width=True)
 
-    if camera_image:
-        image = process_uploaded_image(camera_image)
-        st.image(image, caption="Captured Image", use_container_width=True)
+    # Capture Image Button
+    if st.button("📷 Capture Image"):
+        image = capture_image(camera_index)
+        if image is not None:
+            st.image(image, caption="Captured Image", use_container_width=True)
 
 elif input_method == "📤 Upload Image":
     uploaded_file = st.file_uploader("Upload an image of the product", type=["jpg", "jpeg", "png"])
