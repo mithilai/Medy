@@ -10,14 +10,15 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage
 from langchain.tools import DuckDuckGoSearchRun
 
+load_dotenv()
+
 # ------------------ Load API Keys & Setup ------------------
 load_dotenv()
-groq_api_keys = os.getenv("GROQ_API_KEYS").split(",")  # Store multiple API keys in .env, comma-separated
+groq_api_keys = os.getenv("GROQ_API_KEYS")
 
 def get_chat_model(model_name):
-    """Initializes a ChatGroq model with a random API key & fixed temperature."""
-    selected_key = random.choice(groq_api_keys)  # Randomly select an API key
-    os.environ["GROQ_API_KEY"] = selected_key
+    """Initializes a ChatGroq model with random API key & fixed temperature."""
+    os.environ["GROQ_API_KEY"] = groq_api_keys
     return ChatGroq(model_name=model_name, temperature=0.2)  # Consistent responses
 
 # Initialize LLMs
@@ -25,6 +26,32 @@ ocr_llm = get_chat_model("llama-3.2-90b-vision-preview")  # OCR
 advisor_llm = get_chat_model("llama-3.2-11b-vision-preview")  # Health Analysis
 supervisor_llm = get_chat_model("deepseek-r1-distill-llama-70b")  # Validation
 chatbot_llm = get_chat_model("llama-3.3-70b-specdec")  # General Q&A
+
+# def get_chat_model(model_name):
+#     """Randomly selects a Groq API key and initializes the chat model."""
+#     if not groq_api_keys or groq_api_keys == [""]:
+#         raise ValueError("No valid Groq API keys found in the .env file.")
+
+#     # Randomly select an API key from the list
+#     selected_key = random.choice(groq_api_keys).strip()
+
+#     # Set API key for the environment
+#     os.environ["GROQ_API_KEY"] = selected_key
+
+#     # Initialize the Groq model
+#     return ChatGroq(model_name=model_name, temperature=0.2)
+
+# # ------------------ Load API Keys & Setup ------------------
+# load_dotenv()
+# groq_api_keys = os.getenv("GROQ_API_KEYS").split(",")  # Store multiple API keys in .env, comma-separated
+
+# def get_chat_model(model_name):
+#     """Initializes a ChatGroq model with a random API key & fixed temperature."""
+#     selected_key = random.choice(groq_api_keys)  # Randomly select an API key
+#     os.environ["GROQ_API_KEY"] = selected_key
+#     return ChatGroq(model_name=model_name, temperature=0.2)  # Consistent responses
+
+
 
 # Initialize Web Search Tool
 ddg_search = DuckDuckGoSearchRun()
