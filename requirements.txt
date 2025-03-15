@@ -8,4 +8,4 @@ opencv-python-headless
 pinecone
 sentence-transformers
 numpy
-duckduckgosearch=2.9.0
+duckduckgosearch
