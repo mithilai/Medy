@@ -10,7 +10,7 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import HumanMessage
 from langchain.tools import DuckDuckGoSearchRun
 
-
+# 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
 # ------------------ Load API Keys & Setup ------------------
 load_dotenv()
 groq_api_keys = os.getenv("GROQ_API_KEYS")
