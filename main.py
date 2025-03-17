@@ -16,7 +16,7 @@ from langchain.tools import DuckDuckGoSearchRun
 # groq_api_keys = os.getenv("GROQ_API_KEY")
 
 load_dotenv()
-groq_api_keys = ""
+groq_api_keys = "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"
 
 def get_chat_model(model_name):
     """Initializes a ChatGroq model with random API key & fixed temperature."""
